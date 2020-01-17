@@ -29,6 +29,8 @@ In this repository there are several scripts you can use but you can not just us
     - "buildk8cluster-playbook.yml" =>  ansible playbook script to build kubernetes cluster in deployed infrastructures
     - "deployk8workload-playbook.yml"   =>  ansible playbook script to deploy kubernetes deployment
 
+
+
 > **Note**: The automation scripts are not fully automated scripts since some steps is unable to be done automatically.
 
 To check the example of deployment that I have been done just click this url https://k8mgmtnexus.fourtyspace.com/
