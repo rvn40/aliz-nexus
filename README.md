@@ -31,7 +31,7 @@ In this repository there are several scripts you can use but you can not just us
 
 
 
-> **Note**: The automation scripts are not fully automated scripts since some steps is unable to be done automatically. It also is not easy if you plan to redeploy this script in your own infrastructure because there are many parts should customize with your own infrastructure properties. Meanwhile you can check the link below to checkout my deployment.
+> **Note**: The automation scripts are not fully automated scripts since some steps is unable to be done automatically. It is also not easy if you plan to redeploy this script in your own infrastructure because there are many parts should customize with your own infrastructure properties. Meanwhile you can check the link below to checkout my deployment.
 
 To check the example of deployment that I have been done just click this url https://mgmt.fourtyspace.com/ and https://nexusapp.fourtyspace.com/
 
