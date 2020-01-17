@@ -1,0 +1,13 @@
+---
+
+- name: Install kubectl binary file
+  copy:
+    src: systems/import/clis/kubectl
+    dest: /usr/bin/kubectl
+    owner: root
+    group: root
+    mode: '0751'
+
+#- name: Add gitlab as container registry
+#  shell: kubectl create secret docker-registry gitlab --docker-server="{{gitlab_url}}" --docker-username="{{gitlab_uname}}" --docker-password="{{gitlab_pass}}" --insecure-skip-tls-verify=true
+

@@ -1,0 +1,79 @@
+---
+
+- name: Hosts | Create temp file
+  shell: touch tmp.txt
+
+- name: Hosts | Adding local instance/group in hosts
+  shell: 
+    cmd: |
+        cat > tmp.txt <<EOF
+        [local]
+        localhost ansible_connection=local
+
+        EOF
+
+#- name: Hosts | Adding NAT instance/group in hosts
+#  shell: 
+#    cmd: |
+#        cat >> tmp.txt <<EOF
+#        [nat]
+#        {{ item.name }} ansible_host={{ item.external_ip }} ansible_connection=ssh ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_ssh_private_key_file={{item.keypair}} ansible_user={{item.username}} ansible_python_interpreter=/usr/bin/python3.6
+#
+#        EOF
+#  with_items:
+#    - { name: "{{ node_nat_gateway.name }}", internal_ip: "{{node_nat_gateway.networkInterfaces[0].networkIP}}", external_ip: "{{node_nat_gateway.networkInterfaces[0].accessConfigs[0].natIP}}", keypair: "{{ssh_dir}}/nexus", username: "{{ssh_username}}" }
+
+
+
+- name: Hosts | Adding management instance/group in hosts
+  shell: 
+    cmd: |
+        cat >> tmp.txt <<EOF
+        [mgmt]
+        alias-{{ item.name }} ansible_host={{ item.external_ip }} ansible_connection=ssh ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_ssh_private_key_file={{item.keypair}} ansible_user={{item.username}} ansible_python_interpreter=/usr/bin/python2.7
+        {{ item.name }} ansible_host={{ item.external_ip }} ansible_connection=ssh ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_ssh_private_key_file={{item.keypair}} ansible_user={{item.username}} ansible_python_interpreter=/usr/bin/python3.6
+        
+        EOF
+  with_items:
+    - { name: "{{ node_central_mgmt.name }}", internal_ip: "{{node_central_mgmt.networkInterfaces[0].networkIP}}", external_ip: "{{node_central_mgmt.networkInterfaces[0].accessConfigs[0].natIP}}", keypair: "{{ssh_dir}}/nexus", username: "{{ssh_username}}" }
+
+
+- name: Hosts | Adding kubernetes instance/group in hosts
+  shell: 
+    cmd: |
+        cat >> tmp.txt <<EOF
+        [k8-cluster]
+        {{ item.name }} ansible_host={{ item.external_ip }} ansible_connection=ssh ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_ssh_private_key_file={{item.keypair}} ansible_user={{item.username}} ansible_python_interpreter=/usr/bin/python3        
+        EOF
+  with_items:
+    - { name: "{{ node_kubernetes_02.results[0].name }}", internal_ip: "{{node_kubernetes_02.results[0].networkInterfaces[0].networkIP}}", external_ip: "{{node_kubernetes_02.results[0].networkInterfaces[0].accessConfigs[0].natIP}}", keypair: "{{ssh_dir}}/nexus", username: "{{ssh_username}}" }
+
+- name: Hosts | Adding kubernetes instance/group in hosts
+  shell: 
+    cmd: |
+        cat >> tmp.txt <<EOF
+        {{ item.name }} ansible_host={{ item.external_ip }} ansible_connection=ssh ansible_ssh_extra_args='-o StrictHostKeyChecking=no' ansible_ssh_private_key_file={{item.keypair}} ansible_user={{item.username}} ansible_python_interpreter=/usr/bin/python3        
+        EOF
+  with_items:
+    - { name: "{{ node_kubernetes_02.results[1].name }}", internal_ip: "{{node_kubernetes_02.results[1].networkInterfaces[0].networkIP}}", external_ip: "{{node_kubernetes_02.results[1].networkInterfaces[0].accessConfigs[0].natIP}}", keypair: "{{ssh_dir}}/nexus", username: "{{ssh_username}}" }
+    - { name: "{{ node_kubernetes_03.results[0].name }}", internal_ip: "{{node_kubernetes_03.results[0].networkInterfaces[0].networkIP}}", external_ip: "{{node_kubernetes_03.results[0].networkInterfaces[0].accessConfigs[0].natIP}}", keypair: "{{ssh_dir}}/nexus", username: "{{ssh_username}}" }
+
+- name: Hosts | Create hosts dir
+  file:
+    path: "systems/export/hosts"
+    state: directory
+    mode: '0755'
+
+- name: Hosts | Rewriting new hosts for dependencies
+  shell: cat tmp.txt > systems/export/hosts/dep_hosts
+
+- name: Hosts | Rewriting hosts
+  shell: cat systems/export/hosts/dep_hosts > hosts
+
+- name: Hosts | Remove temp file
+  file:
+    path: tmp.txt
+    state: absent
+
+- name: Hosts | Refresh inventory to ensure new instances exist in inventory
+  meta: refresh_inventory

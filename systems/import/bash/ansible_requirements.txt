@@ -1,0 +1,8 @@
+boto==2.49.0
+boto3==1.11.1
+docker-py==1.10.6
+pexpect==4.7.0
+apache-libcloud==2.8.0
+requests==2.22.0
+google-auth==1.10.1
+docker==4.1.0

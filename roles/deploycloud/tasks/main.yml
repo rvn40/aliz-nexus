@@ -1,0 +1,15 @@
+---
+# tasks file for roles/deploycloud
+
+- import_tasks: vpc.yml
+- import_tasks: subnetwork.yml
+- import_tasks: firewalls.yml
+- import_tasks: nodes/central_mgmt_node.yml
+- import_tasks: nodes/kubernetes_nodes.yml
+#- import_tasks: nodes/nat_gateway.yml   
+- import_tasks: gathering_nodes_props.yml
+#- import_tasks: nat_gateway/pre_configuration.yml
+#- import_tasks: nat_gateway/configuration.yml
+- import_tasks: rancher2/install_rancher2_docker.yml
+- import_tasks: rancher2/install_nginx_reverse_proxy.yml
+- import_tasks: rancher2/install_docker_k8_nodes.yml

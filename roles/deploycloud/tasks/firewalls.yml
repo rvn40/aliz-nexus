@@ -1,0 +1,41 @@
+---
+
+- name: firewall | create a 'standard' firewall rule
+  gcp_compute_firewall:
+    name: "{{ prefix_name }}-allow-standard-public"
+    description: "Nexus firewall rules used by public to access any resources under VPC. The standard opened ports in this vpc are ssh and https ports"
+    network: "{{vpc}}"
+    allowed:
+    - ip_protocol: tcp
+      ports:
+      - '22'
+      - '443'
+      - '80'
+      - '8081'
+    target_tags:
+    - allow-standard-public
+    source_ranges:
+    - "{{ wild_world_range }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    state: "{{ default_resource_state }}"
+  register: standard_fw_rule
+
+
+- name: firewall | create a 'all open ports' firewall rule
+  gcp_compute_firewall:
+    name: "{{ prefix_name }}-allow-all-internal"
+    description: "Nexus firewall rules used by internal vpc resources to access any resources under same VPC. The all opened ports in this vpc are to be used for all protocols"
+    network: "{{vpc}}"
+    allowed:
+    - ip_protocol: all
+    target_tags:
+    - allow-all-internal
+    source_ranges:
+    - "{{ internal_vpc_range }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    state: "{{ default_resource_state }}"
+  register: allinternal_fw_rule

@@ -1,0 +1,8 @@
+---
+# defaults file for roles/buildk8cluster
+
+
+cluster_name: "nexus-dev"
+cluster_desc: "cluster for nexus apps"
+project_name: "nexus-project"
+

@@ -1,0 +1,31 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    field.cattle.io/creatorId: user-ctd6l
+    field.cattle.io/ingressState: '{"Y2xvdWRmbGFyZQ==":"p-ghdn9:cloudflare","bmV4dXNpbmdyZXNzL25leHVzLW5hbWVzcGFjZS9uZXh1c2FwcC5mb3VydHlzcGFjZS5jb20vLzgwODE=":""}'
+    field.cattle.io/publicEndpoints: '[{"addresses":["10.24.1.27"],"port":80,"protocol":"HTTP","serviceName":"nexus-namespace:nexusapp","ingressName":"nexus-namespace:nexusingress","hostname":"nexusapp.fourtyspace.com","allNodes":true}]'
+  creationTimestamp: "2020-01-17T08:45:36Z"
+  generation: 1
+  labels:
+    cattle.io/creator: norman
+  name: nexusingress
+  namespace: nexus-namespace
+  resourceVersion: "18985"
+  selfLink: /apis/extensions/v1beta1/namespaces/nexus-namespace/ingresses/nexusingress
+  uid: f7453542-6ff8-4664-9711-602ec1af8757
+spec:
+  rules:
+  - host: nexusapp.fourtyspace.com
+    http:
+      paths:
+      - backend:
+          serviceName: nexusapp
+          servicePort: 8081
+  tls:
+  - secretName: cloudflare
+status:
+  loadBalancer:
+    ingress:
+    - ip: 10.24.1.27
+    - ip: 10.24.2.14

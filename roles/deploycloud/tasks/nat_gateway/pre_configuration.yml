@@ -1,0 +1,57 @@
+---
+
+- name: Wait 300 seconds, but only start checking after 60 seconds
+  wait_for_connection:
+    timeout: 120
+  delegate_to: nexus-nat-gateway-node
+
+- name: Confirmation of packages installation
+  pause: prompt='These packages (binutils, gcc, bash, curl, sudo, ca_root_nss, wget, git, vim-console, python27, python37, py27-pip, py37-pip) are going to be installed. Would you like to proceed, y/n? (CASE SENSITIVE!!) '
+  register: userConfirm
+  delegate_to: nexus-nat-gateway-node
+  
+- name: Evaluate user input
+  shell: exit 1
+  when: userConfirm.user_input == "n"
+  delegate_to: nexus-nat-gateway-node
+
+- name: Evaluate user input
+  shell: exit 1
+  when: userConfirm.user_input == "N"
+  delegate_to: nexus-nat-gateway-node
+
+- name: Evaluate user input
+  shell: exit 1
+  when: userConfirm.user_input != "y"
+  delegate_to: nexus-nat-gateway-node
+
+- name: Make sure known_hosts file in ansible node is clean
+  shell: echo "" > /root/.ssh/known_hosts
+
+#- name: Update packages
+#  shell: pkg update
+#  delegate_to: nexus-nat-gateway-node
+
+- name: Install base packages
+  pkgng:
+    name: ['binutils', 'gcc', 'bash', 'curl', 'sudo', 'ca_root_nss', 'wget', 'git', 'vim-console', 'python27', 'python37', 'py27-pip','py37-pip']
+    state: present
+  when: userConfirm.user_input == "y"
+  delegate_to: nexus-nat-gateway-node
+  become: yes
+  become_user: root
+  become_method: su
+
+- name: Configure user
+  shell: id nexus 
+  delegate_to: nexus-nat-gateway-node
+  become: yes
+  become_user: root
+  become_method: su
+
+- name: Configure usergroup
+  shell: pw usermod -n nexus -G wheel 
+  delegate_to: nexus-nat-gateway-node
+  become: yes
+  become_user: root
+  become_method: su

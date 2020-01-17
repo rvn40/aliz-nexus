@@ -1,0 +1,83 @@
+---
+
+#- name: "Check installed packages"
+#  package_facts:
+#    manager: "apt"  
+#  register: package_results
+
+# Mounting secondary disk
+- name: Reassign permission of keypair
+  shell: chmod 400 "{{ssh_dir}}"/nexus*
+
+- name: Delete known_hosts record
+  shell: echo "" > /root/.ssh/known_hosts
+
+- name: Create mounted dir for rancher2 disk
+  file:
+    path: "/home/{{ssh_username}}/rancher2"
+    state: directory
+    mode: '0755'
+  delegate_to: nexus-central-mgmt-node
+  
+# Installing docker
+
+- name: Install dependencies for docker installations
+  apt:
+    name: "{{ packages }}"
+    state: latest
+    default_release: bionic
+    update_cache: yes
+  vars:
+    packages:
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+      - curl
+      - python
+      - python-pip
+      - python3-pip
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: nexus-central-mgmt-node
+
+- name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: nexus-central-mgmt-node
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: nexus-central-mgmt-node
+   
+- name: Install Docker
+  apt:
+    name: docker-ce=5:18.09.4~3-0~ubuntu-bionic
+    update_cache: yes
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: nexus-central-mgmt-node
+
+- name: Install docker module
+  shell: pip install docker
+#  when: "'docker-py' not in package_results.ansible_facts.packages"
+  delegate_to: alias-nexus-central-mgmt-node
+
+# Install rancher2 and shared volume to disk 2
+
+- name: Create a rancher2 container
+  docker_container:
+    name: k8mgmt-rancher2
+    image: rancher/rancher:v2.3.3
+    restart_policy: unless-stopped
+    detach: yes
+    ports:
+      - "80:80"
+    volumes:
+      - /home/{{ssh_username}}/rancher2:/var/lib/rancher
+  register: dedock_status
+  delegate_to: alias-nexus-central-mgmt-node
+
+- debug: var=dedock_status.stdout_lines
+  delegate_to: nexus-central-mgmt-node
+
+

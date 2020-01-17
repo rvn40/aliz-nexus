@@ -1,0 +1,15 @@
+---
+
+- name: vpc | create a nexus vpc
+  gcp_compute_network:
+    name: "{{ prefix_name }}-vpc"
+    auto_create_subnetworks: 'false'
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    state: "{{ default_resource_state }}"
+  register: vpc
+
+#- name: debug of var
+#  debug:
+#    var: vpc.selfLink

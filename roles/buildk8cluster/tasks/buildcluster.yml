@@ -1,0 +1,45 @@
+---
+
+- name: Install rancher2 binary file
+  copy:
+    src: systems/import/clis/rancher-v2.3.2/rancher
+    dest: /usr/bin/rancher
+    owner: root
+    group: root
+    mode: '0751'
+
+#- name: Rancher URL  
+#  pause: prompt='Insert endpoint of rancher2 '
+#  register: endpointRancher
+#
+#- name: Rancher Bearer Token 
+#  pause: prompt='Insert bearer token of rancher2 '
+#  register: bearerToken
+
+- name: Login to rancher2.... 
+  shell: rancher login "{{rancher_endpoint}}" --token "{{bearer_token}}"
+
+#- name: Insert cluster name 
+#  pause: prompt='Please insert your kubernetes cluster name '
+#  register: clusterName
+#
+#- name: Insert cluster description 
+#  pause: prompt='Please insert your description about the cluster '
+#  register: clusterDesc
+
+- name: Create cluster
+  shell: rancher cluster create --description "{{cluster_desc}}" "{{cluster_name}}"
+
+- name: Show clustes
+  shell: rancher cluster ls
+  register: clusterlist
+- debug:
+    var: clusterlist.stdout_lines
+
+- name: Select cluster id to create a new project!! 
+  pause: prompt='Select the cluster id based on information above e.g. c-94zcx (CASE SENSITIVE!!) '
+  register: clusterSelect
+
+- name: Create a project
+  shell: rancher project create --cluster "{{clusterSelect.user_input}}" "{{project_name}}"
+  register: projectCreating

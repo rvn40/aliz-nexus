@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    field.cattle.io/publicEndpoints: '[{"addresses":["10.24.1.27"],"port":80,"protocol":"HTTP","serviceName":"nexus-namespace:nexusapp","ingressName":"nexus-namespace:nexusingress","hostname":"nexusapp.fourtyspace.com","allNodes":true}]'
+  creationTimestamp: "2020-01-17T08:38:20Z"
+  generation: 3
+  labels:
+    cattle.io/creator: norman
+    workload.user.cattle.io/workloadselector: deployment-nexus-namespace-nexusapp
+  name: nexusapp
+  namespace: nexus-namespace
+  resourceVersion: "18993"
+  selfLink: /apis/apps/v1/namespaces/nexus-namespace/deployments/nexusapp
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-nexus-namespace-nexusapp
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        cattle.io/timestamp: "2020-01-17T06:41:49Z"
+        field.cattle.io/ports: '[[{"containerPort":8081,"dnsName":"nexusapp","kind":"ClusterIP","name":"8081tcp02","protocol":"TCP"}]]'
+      creationTimestamp: null
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-nexus-namespace-nexusapp
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: role
+                operator: In
+                values:
+                - worker
+      containers:
+      - env:
+        - name: INSTALL4J_ADD_VM_PARAMS
+          value: -Xms1200m -Xmx1200m -XX:MaxDirectMemorySize=2g -Djava.util.prefs.userRoot=/nexus-data
+        - name: NEXUS_CONTEXT
+          value: nexus
+        image: registry.gitlab.com/myrepor/jobs/aliz-nexus-image:latest
+        imagePullPolicy: Always
+        name: nexusapp
+        ports:
+        - containerPort: 8081
+          name: 8081tcp02
+          protocol: TCP
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: {}
+          privileged: false
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: gitlab
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+status:
+  availableReplicas: 2
+  observedGeneration: 3
+  readyReplicas: 2
+  replicas: 2
+  updatedReplicas: 2

@@ -1,0 +1,77 @@
+---
+
+- name: Register a node
+  shell: rancher cluster add-node --controlplane --etcd --label role=etcdcp "{{clusterSelect.user_input}}"
+  register: registerNode
+- debug:
+    var: registerNode.stdout_lines[1]
+
+- name: Install agent to a node
+  shell: "{{registerNode.stdout_lines[1]}}"
+  delegate_to: nexus-kube-node-01
+
+- name: Wait the instance up 4 minutes
+  pause:
+    minutes: 4
+
+- name: Register a node
+  shell: rancher cluster add-node --worker --label role=worker "{{clusterSelect.user_input}}"
+  register: registerNode2
+- debug:
+    var: registerNode2.stdout_lines[1]
+
+- name: Install agent to a node
+  shell: "{{registerNode2.stdout_lines[1]}}"
+  delegate_to: nexus-kube-node-02
+
+- name: Wait the instance up 4 minutes
+  pause:
+    minutes: 4
+
+- name: Register a node
+  shell: rancher cluster add-node --worker --label role=worker "{{clusterSelect.user_input}}"
+  register: registerNode3
+- debug:
+    var: registerNode3.stdout_lines[1]
+
+- name: Install agent to a node
+  shell: "{{registerNode3.stdout_lines[1]}}"
+  delegate_to: nexus-kube-node-03
+
+#- name: Create registration node token
+#  shell: "{{item}}"
+#  with_items:
+#    - "curl -s '{{rancher_endpoint}}/clusterregistrationtoken' -H 'content-type: application/json' -H \"Authorization: Bearer {{bearer_token}}\" --data-binary '{\"type\":\"clusterRegistrationToken\",\"clusterId\":\"'c-94zcx'\"}' --insecure > /dev/null"
+
+
+#- name: Get registration node token
+#  shell: |
+#    #!/bin/bash
+#
+#    AGENTCMD="{{item}}"
+#
+#    DOCKERRUNCMD="$AGENTCMD --etcd --controlplane"
+#
+#    echo $AGENTCMD > tmp.txt
+#  args:
+#    executable: /bin/bash
+#  with_items:
+#    - "curl -s '{{rancher_endpoint}}/clusterregistrationtoken?id=\"'c-94zcx'\" ' -H 'content-type: application/json' -H \"Authorization: Bearer {{bearer_token}}\" --insecure | jq -r '.data[].nodeCommand' | head -1"
+
+
+#- name: Get registration node token
+#  shell: "{{item}}"
+#  with_items:
+#    - touch output.txt
+#    - "curl -s '{{rancher_endpoint}}/clusterregistrationtoken?id=\"'c-94zcx'\" ' -H 'content-type: application/json' -H \"Authorization: Bearer {{bearer_token}}\" --insecure | jq -r '.data[].nodeCommand' | head -1 -o output.txt"
+
+#- name: Get registration node token
+#  get_url:
+#    url: "{{item}}"
+#    dest: tmp.txt
+#    mode: '0644'
+#  with_items:
+#    - "curl -s '{{rancher_endpoint}}/clusterregistrationtoken?id=\"'c-94zcx'\" ' -H 'content-type: application/json' -H \"Authorization: Bearer {{bearer_token}}\" --insecure | jq -r '.data[].nodeCommand' | head -1"
+
+
+

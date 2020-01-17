@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "leafy-oxide-264901",
+  "private_key_id": "f8cbf6a75eca5f89128d9c3f235d3b3cec421b2a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCOcXyvpCSmHyv1\ns9laLf+H47xxyCKtmRePDCtDK0i7/u7m//JRfyCXFQQEuNKBGLL9AO5l7CV+OzOE\n/WY0VhnVseuCBu3sxpvYURXsNFNztQgS7Ay3Tws9yUaB2qvQBM6o+uPFBi0u2nY2\nR4KLJCkTeyq0y35tSSpxSZ4unAoirpW1UTfLqFFxLmWJHxuRp+lN47tUhPgBJm/b\n89c+Jq6fpWzldY2AC0Z+pqCk8a8mmWv1kuSEL1dhUoWoMKjMLdCymim728ELSNK6\ni3ttGeda77ZgJGFFHkSEcPo1G0UZS6Db7MwfzS+lokOYnlfE/CVcK3hoLZUKG00D\nLEjZN7G5AgMBAAECggEAKwv95+CdmLxz3wF2jou3HPyEXwhh/n91AKxnSJnEldfB\nn/q6Ysmd8jqOJ9Uo/I2XzeDhqtiWLhM7CxY/NFLO5OcranSoo3UT9OfwTZ00mROc\n+Ibwgtc26PmyPpz0bl19jNChU9H9hprLvbSXrXAEn9gJfHDA6MsDMhBS5vgOEhOo\nS96+j2HEqvY8OFRiUYmWdazGN08sv9fF4etT/0QaNpAPZtWw6EkryNJKgpMWVZmv\nypcE5GIjJLYSQX0XC32vn5vKKjUH6VfBKvuDF5yEZyDlTDXDgvurKjPaDhlHp7br\nt2P/xXLrnI3FP0sQacMLtUrnq5NNoEu+glEtPxYfpwKBgQDABPIm6KYA/tIXY/tC\nrUMKG054JI471df3/WX+Mz+VpJ4DYqER16jvm8TfsCLlhR3SAaRwOFPqVHpWfI5B\nLGUIXsrF+2jw/E1BeESEqFSF4QFB4qxV3ZfGb4Xx+qsguiOxrO2uJJOZzbqobqvD\ntTG1UJe/pVdLIV0Ki2n7qAEGMwKBgQC958Ho4vP97rn5uFLbKWE1HIDAMnxY5khx\nI5gREV1CFrFhDxrhNx19X2ToE+FAz0+FCRY6FjBxxscmC0vY7giVErr2qKtL6GQP\nBDZNPxeMnStmkwCaCvSjEFXxmjuJo2B6i2L97sgO3591GMqIKMvLlk6gu4IvXWzZ\ngPxMX+CEYwKBgQCmLKGTYosnGV+ftnrffSojOPZzqs8coTfB+Z2mm5tPWaMVsulJ\nk6Uzl06NdtT8ZHMmJx2zsEuO44TsC+bgKBdXYxGAvM5Yn0AMhJRnaXWcVtjLt+sE\ndDzBEgqNGy21qODzBoC60BScaho7YWtsdwaJrzFkPSaKclkeowAZNY+NWQKBgB/8\nzKXMrKqGLp9Ik/REiRIoJeu51UYoK+WayD9/vESoi+I8aButa/M1QUryJkwDX3Ka\nMDtCh5BymhLnbjQxDBMIH6Pyjz/u+gOpgvgJ+4583tWdR0mrNL/OvZs/jm3FrjeW\nCOua7+nJcxOHRH4g2QsG22Gpk+kkhHQyjMzUjX3fAoGATS6I+G8K0n+hvYUqKgGp\nuR4PL9SzwS0++oOA9tSnCXEITIRl3dcHDJYCYS7QmiCWPG45MQia0uG3SmuAOwtg\nJjXR8F9mtXQvkl5PTO8HIalthtqbNk8OBYDXBpW48mr05u4usuWbh+QnZPMgvCTZ\nDNcteCuJEHFp+mCS+Mx3ZIo=\n-----END PRIVATE KEY-----\n",
+  "client_email": "nexus-ansible@leafy-oxide-264901.iam.gserviceaccount.com",
+  "client_id": "116026377845729663283",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/nexus-ansible%40leafy-oxide-264901.iam.gserviceaccount.com"
+}

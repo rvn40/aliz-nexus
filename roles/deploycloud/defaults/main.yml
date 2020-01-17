@@ -1,0 +1,33 @@
+---
+# defaults file for roles/deploycloud
+
+prefix_name: "nexus"
+project_id: "leafy-oxide-264901"
+authkind: "serviceaccount"
+serviceaccount_email: "nexus-ansible@leafy-oxide-264901.iam.gserviceaccount.com"
+serviceaccount_name: "nexus-ansible.json"
+serviceaccount_dir: "systems/import/serviceaccounts"
+ssh_username: "nexus"
+ssh_dir: "systems/import/ssh"
+ssh_filename: "nexus.pub"
+default_resource_state: "present"
+default_region: "us-west1" # oregon
+
+subnet_range_01: "10.24.0.0/24"
+subnet_range_02: "10.24.1.0/24"
+subnet_range_03: "10.24.2.0/24"
+wild_world_range: "0.0.0.0/0"
+internal_vpc_range: "10.24.0.0/16"
+
+
+# Check these links to find out how gcp os images url formed
+#   - https://gist.github.com/pydevops/cffbd3c694d599c6ca18342d3625af97
+#   - https://cloud.google.com/compute/docs/reference/rest/v1/images
+#   - https://cloud.google.com/compute/docs/images
+#   - https://cloud.google.com/sdk/gcloud/reference/compute/images/list
+
+ubuntu18_source_image: "https://www.googleapis.com/compute/v1/projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20190429"
+freebsd12_source_image: "https://www.googleapis.com/compute/v1/projects/freebsd-org-cloud-dev/global/images/freebsd-12-0-release-amd64"
+
+default_machine_type: "n1-standard-2"
+default_machine_type_02: "n1-standard-1"

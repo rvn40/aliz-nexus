@@ -1,0 +1,4 @@
+---
+# tasks file for roles/deployk8workload
+
+- import_tasks: deployworkloads.yml

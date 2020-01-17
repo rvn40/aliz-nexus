@@ -1,0 +1,97 @@
+---
+
+- name: node | create kubernetes instances in subnet02
+  gcp_compute_instance:
+    name: "{{ prefix_name }}-kube-node-{{ item }}"
+    machine_type: "{{ default_machine_type }}"
+    disks:
+    - auto_delete: true
+      boot: true
+      initialize_params:
+        disk_size_gb: 30
+        source_image: "{{ubuntu18_source_image}}"
+    zone: "{{ default_region }}-b"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    network_interfaces:
+      - network: "{{ vpc }}"
+        subnetwork: "{{ subnet02 }}"
+        access_configs:
+          - name: External NAT
+            type: ONE_TO_ONE_NAT
+    state: "{{ default_resource_state }}"
+  register: node_kubernetes_02
+  with_items:
+    - "01"
+    - "02"
+
+- name: node | create an kubernetes instance subnet03
+  gcp_compute_instance:
+    name: "{{ prefix_name }}-kube-node-{{ item }}"
+    machine_type: "{{ default_machine_type }}"
+    disks:
+    - auto_delete: true
+      boot: true
+      initialize_params:
+        disk_size_gb: 30
+        source_image: "{{ubuntu18_source_image}}"
+    zone: "{{ default_region }}-c"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    network_interfaces:
+      - network: "{{ vpc }}"
+        subnetwork: "{{ subnet03 }}"
+        access_configs:
+          - name: External NAT
+            type: ONE_TO_ONE_NAT
+    state: "{{ default_resource_state }}"
+  register: node_kubernetes_03
+  with_items:
+    - "03"
+
+#- name: debug of var 2
+#  debug:
+#    var: node_kubernetes_02.results[1].invocation.module_args.zone
+
+- name: node | add internal tags to instance
+  gce_tag:
+    instance_name: "{{ item.vm_name }}"
+    service_account_email: "{{ serviceaccount_email }}"
+    pem_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    project_id: "{{ project_id }}"
+    tags: "{{ item.rule }}"
+    zone: "{{ item.zone }}"
+    state: "{{ default_resource_state }}"
+  with_items:
+    - { vm_name: "{{ node_kubernetes_02.results[0].name }}", rule: "{{ allinternal_fw_rule.targetTags }}", zone: "{{node_kubernetes_02.results[0].invocation.module_args.zone}}" }
+    - { vm_name: "{{ node_kubernetes_02.results[1].name }}", rule: "{{ allinternal_fw_rule.targetTags }}", zone: "{{node_kubernetes_02.results[1].invocation.module_args.zone}}" }
+    - { vm_name: "{{ node_kubernetes_03.results[0].name }}", rule: "{{ allinternal_fw_rule.targetTags }}", zone: "{{node_kubernetes_03.results[0].invocation.module_args.zone}}" }
+
+- name: node | add standard tags to instance
+  gce_tag:
+    instance_name: "{{ item.vm_name }}"
+    service_account_email: "{{ serviceaccount_email }}"
+    pem_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    project_id: "{{ project_id }}"
+    tags: "{{ item.rule }}"
+    zone: "{{ item.zone }}"
+    state: "{{ default_resource_state }}"
+  with_items:
+    - { vm_name: "{{ node_kubernetes_02.results[0].name }}", rule: "{{ standard_fw_rule.targetTags }}", zone: "{{node_kubernetes_02.results[0].invocation.module_args.zone}}" }
+    - { vm_name: "{{ node_kubernetes_02.results[1].name }}", rule: "{{ standard_fw_rule.targetTags }}", zone: "{{node_kubernetes_02.results[1].invocation.module_args.zone}}" }
+    - { vm_name: "{{ node_kubernetes_03.results[0].name }}", rule: "{{ standard_fw_rule.targetTags }}", zone: "{{node_kubernetes_03.results[0].invocation.module_args.zone}}" }
+
+- name: node | gcloud login to project
+  shell: gcloud auth activate-service-account "{{serviceaccount_email}}" --key-file="{{ serviceaccount_dir }}/{{ serviceaccount_name }}" --project="{{project_id}}"
+
+- name: node | add ssh keys to instance
+  shell: gcloud compute instances add-metadata "{{ item.vm_name }}" --zone="{{ item.zone }}" --metadata-from-file ssh-keys="{{ssh_dir}}/{{ssh_filename}}"
+  with_items:
+    - { vm_name: "{{ node_kubernetes_02.results[0].name }}", zone: "{{node_kubernetes_02.results[0].invocation.module_args.zone}}" }
+    - { vm_name: "{{ node_kubernetes_02.results[1].name }}", zone: "{{node_kubernetes_02.results[1].invocation.module_args.zone}}" }
+    - { vm_name: "{{ node_kubernetes_03.results[0].name }}", zone: "{{node_kubernetes_03.results[0].invocation.module_args.zone}}" }
+
+- name: node | gcloud logout to project
+  shell: gcloud auth revoke "{{serviceaccount_email}}"

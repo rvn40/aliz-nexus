@@ -1,0 +1,152 @@
+---
+
+- name: Change permission of keypair
+  shell: chmod 400 systems/import/ssh/*
+
+- name: Wait the instance up 3 minutes
+  pause:
+    minutes: 3
+
+- name: Copy bash file
+  copy:
+    src: systems/import/bash/nat_ip_forward.sh
+    dest: "/home/{{ssh_username}}/nat_ip_forward.sh"
+    owner: root
+    group: root
+    mode: '0644'
+  delegate_to: nexus-nat-gateway-node
+
+- name: Change mode executable
+  file:
+    path: "/home/{{ssh_username}}/nat_ip_forward.sh"
+    state: file
+    mode: '0751'
+  delegate_to: nexus-nat-gateway-node
+
+- name: Execute bash file
+  shell: bash /home/"{{ssh_username}}"/nat_ip_forward.sh
+  delegate_to: nexus-nat-gateway-node
+
+- name: Route the network
+  shell: "{{ item }}"
+  with_items:
+    - gcloud auth activate-service-account "{{serviceaccount_email}}" --key-file="{{ serviceaccount_dir }}/{{ serviceaccount_name }}" --project="{{project_id}}"
+    - gcloud compute routes create nat-all-route --network "{{ prefix_name }}-vpc" --destination-range "0.0.0.0/0" --next-hop-instance "{{node_nat_gateway.name}}" --next-hop-instance-zone "{{ default_region }}-a" --tags nat-all --priority 1000 --description "route all traffic through {{prefix_name}}-nat-gateway"
+    - gcloud auth revoke "{{serviceaccount_email}}"
+
+#- name: Check that the pf.conf exists
+#  stat:
+#    path: /etc/pf.conf
+#  register: pf_results
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Check that the rc.conf exists
+#  stat:
+#    path: /etc/rc.conf
+#  register: rc_results
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Create the pf.conf, if it doesnt exist already
+#  file:
+#    path: /etc/pf.conf
+#    state: touch
+#  when: pf_results.stat.exists == False
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Create the rc.conf, if it doesnt exist already
+#  file:
+#    path: /etc/rc.conf
+#    state: touch
+#  when: rc_results.stat.exists == False
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Backup default pf file
+#  copy:
+#    src: /etc/pf.conf
+#    dest: /etc/pf.bk.ansible-"{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+#    owner: root
+#    group: wheel
+#    mode: '0644'
+#    remote_src: yes
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Backup default rc file
+#  copy:
+#    src: /etc/rc.conf
+#    dest: /etc/rc.conf.bk.ansible-"{{ ansible_date_time.date }}-{{ ansible_date_time.hour }}-{{ ansible_date_time.minute }}-{{ ansible_date_time.second }}"
+#    owner: root
+#    group: wheel
+#    mode: '0644'
+#    remote_src: yes
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Configure pf nat server
+#  copy:
+#    src: roles/deploycloud/files/nat_gateway/pf.conf
+#    dest: /etc/pf.conf
+#    owner: root
+#    group: wheel
+#    mode: 0644
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Configure rc nat server
+#  copy:
+#    src: roles/deploycloud/files/nat_gateway/rc.conf
+#    dest: /etc/rc.conf
+#    owner: root
+#    group: wheel
+#    mode: 0644
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Load kernel module pf
+#  shell: kldload -n pf
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Reload services
+#  shell: pfctl -f /etc/pf.conf
+#  register: pf_status
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- debug: var=pf_status
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su
+#
+#- name: Reboot a slow machine that might have lots of updates to apply
+#  reboot:
+#    reboot_timeout: 250
+#  delegate_to: nexus-nat-gateway-node
+#  become: yes
+#  become_user: root
+#  become_method: su

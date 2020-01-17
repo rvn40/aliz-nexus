@@ -1,0 +1,42 @@
+---
+
+- name: subnetwork | create a nexus subnetwork 01
+  gcp_compute_subnetwork:
+    name: "{{ prefix_name }}-subnet-01"
+    region: "{{ default_region }}"
+    network: "{{ vpc }}"
+    ip_cidr_range: "{{ subnet_range_01 }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    state: "{{ default_resource_state }}"
+  register: subnet01
+
+#- name: debug of var
+#  debug:
+#    var: subnet01
+
+- name: subnetwork | create a nexus subnetwork 02
+  gcp_compute_subnetwork:
+    name: "{{ prefix_name }}-subnet-02"
+    region: "{{ default_region }}"
+    network: "{{ vpc }}"
+    ip_cidr_range: "{{ subnet_range_02 }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    state: "{{ default_resource_state }}"
+  register: subnet02
+
+- name: subnetwork | create a nexus subnetwork 03
+  gcp_compute_subnetwork:
+    name: "{{ prefix_name }}-subnet-03"
+    region: "{{ default_region }}"
+    network: "{{ vpc }}"
+    ip_cidr_range: "{{ subnet_range_03 }}"
+    project: "{{ project_id }}"
+    auth_kind: "{{ authkind }}"
+    service_account_file: "{{ serviceaccount_dir }}/{{ serviceaccount_name }}"
+    state: "{{ default_resource_state }}"
+  register: subnet03
+

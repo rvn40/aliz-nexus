@@ -1,0 +1,20 @@
+---
+
+- name: Login to rancher2.... 
+  expect:
+    command: rancher login "{{rancher_endpoint}}" --token "{{bearer_token}}"
+    responses:
+      'Select a Project:': "2"
+
+- name: create namespace
+  shell: rancher namespace create nexus-namespace
+
+- name: deploy the deployment
+  shell: rancher kubectl apply -f systems/import/k8yml/nexus-deployment.yml --insecure-skip-tls-verify=true
+
+- name: Wait the instance up 30 seconds
+  pause:
+    seconds: 30
+
+- name: deploy ingress
+  shell: rancher kubectl apply -f systems/import/k8yml/nexus-service.yml --insecure-skip-tls-verify=true

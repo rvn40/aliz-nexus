@@ -1,0 +1,85 @@
+---  
+
+# Import necesarries files
+
+- name: Create nginx dir
+  file:
+    path: "/home/{{ssh_username}}/nginx"
+    state: directory
+    mode: '0755'
+  delegate_to: nexus-central-mgmt-node
+
+- name: Copy file with owner and permissions
+  copy:
+    src: systems/import/nginx/nginx.conf
+    dest: "/home/{{ssh_username}}/nginx/nginx.conf"
+    owner: "{{ssh_username}}"
+    group: root
+    mode: '0644'
+  delegate_to: nexus-central-mgmt-node
+
+# ======= Cloudflare ========
+
+- name: Create cloudflare dir
+  file:
+    path: "/home/{{ssh_username}}/cloudflare"
+    state: directory
+    mode: '0755'
+  delegate_to: nexus-central-mgmt-node
+
+- name: Copy file with owner and permissions
+  copy:
+    src: systems/import/cloudflare/cert.pem
+    dest: "/home/{{ssh_username}}/cloudflare/cert.pem"
+    owner: "{{ssh_username}}"
+    group: root
+    mode: '0400'
+  delegate_to: nexus-central-mgmt-node
+
+- name: Copy file with owner and permissions
+  copy:
+    src: systems/import/cloudflare/cert.key
+    dest: "/home/{{ssh_username}}/cloudflare/cert.key"
+    owner: "{{ssh_username}}"
+    group: root
+    mode: '0400'
+  delegate_to: nexus-central-mgmt-node
+    
+
+# Install nginx
+
+- name: Create a nginx container
+  docker_container:
+    name: k8mgmt-nginx
+    image: nginx
+    restart_policy: unless-stopped
+    detach: yes
+    ports:
+      - "443:443"
+    volumes:
+      - /home/{{ssh_username}}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /home/{{ssh_username}}/cloudflare/cert.pem:/etc/nginx/cert.pem
+      - /home/{{ssh_username}}/cloudflare/cert.key:/etc/nginx/cert.key
+  delegate_to: alias-nexus-central-mgmt-node
+
+- name: Create virtual docker network
+  docker_network:
+    name: nexusnet01
+    connected:
+      - k8mgmt-nginx
+      - k8mgmt-rancher2
+    appends: yes
+  delegate_to: alias-nexus-central-mgmt-node
+
+
+# Create nexus dir
+
+- name: Create nexus dir
+  file:
+    path: "/nexus-data"
+    state: directory
+    mode: '0755'
+  delegate_to: "{{item}}"
+  with_items:
+    - nexus-kube-node-02
+    - nexus-kube-node-03

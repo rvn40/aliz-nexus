@@ -1,0 +1,44 @@
+---
+
+# Installing docker
+
+- name: Install dependencies for docker installations
+  apt:
+    name: "{{ packages }}"
+    state: latest
+    default_release: bionic
+    update_cache: yes
+  vars:
+    packages:
+      - apt-transport-https
+      - ca-certificates
+      - software-properties-common
+      - curl
+      - python
+      - python-pip
+      - python3-pip
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['k8-cluster'] }}"
+
+- name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['k8-cluster'] }}"
+
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['k8-cluster'] }}"
+   
+- name: Install Docker
+  apt:
+    name: docker-ce=5:18.09.9~3-0~ubuntu-bionic
+    update_cache: yes
+#  when: "'docker' not in package_results.ansible_facts.packages"
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['k8-cluster'] }}"
+
